@@ -3,231 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HealthSim - Autenticação</title>
+<title>HealthSim Dashboard Profissional</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
 <style>
-:root{
-  --primary:#0F4C75;
-  --accent:#1B9AAA;
-  --light:#F5F7FA;
-  --text:#1F2937;
-  --error:#EF4444;
-}
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Inter',sans-serif;
-}
-
-body{
-  background:linear-gradient(135deg,#0F4C75,#1B9AAA);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:100vh;
-}
-
-.auth-container{
-  background:white;
-  width:400px;
-  padding:40px;
-  border-radius:16px;
-  box-shadow:0 15px 40px rgba(0,0,0,0.15);
-}
-
-.logo{
-  text-align:center;
-  font-weight:700;
-  font-size:22px;
-  margin-bottom:25px;
-  color:var(--primary);
-}
-
-.tabs{
-  display:flex;
-  margin-bottom:25px;
-}
-
-.tabs button{
-  flex:1;
-  padding:10px;
-  border:none;
-  background:#eee;
-  cursor:pointer;
-  font-weight:600;
-}
-
-.tabs button.active{
-  background:var(--primary);
-  color:white;
-  border-radius:8px;
-}
-
-form{
-  display:none;
-}
-
-form.active{
-  display:block;
-}
-
-input, select{
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:14px;
-}
-
-input:focus{
-  border-color:var(--accent);
-  outline:none;
-}
-
-button.submit-btn{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-  background:var(--primary);
-  color:white;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-button.submit-btn:hover{
-  background:#0b3b5a;
-}
-
-.error{
-  color:var(--error);
-  font-size:13px;
-  margin-top:5px;
-}
-
-.footer{
-  text-align:center;
-  margin-top:15px;
-  font-size:13px;
-  color:#666;
-}
-
-@media(max-width:480px){
-  .auth-container{
-    width:90%;
-    padding:25px;
-  }
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{background:#f5f6fa;color:#333;}
+nav{background:#fff;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+.logo{font-weight:700;font-size:20px;color:#0F4C75;}
+.nav-right{display:flex;align-items:center;gap:15px;}
+.logout{background:#0F4C75;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;}
+.container{max-width:1200px;margin:auto;padding:40px 20px;}
+.welcome{margin-bottom:30px;}
+.welcome h1{font-size:28px;margin-bottom:5px;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:40px;}
+.stat{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.05);}
+.stat h3{font-size:14px;color:#666;margin-bottom:6px;}
+.stat p{font-size:20px;font-weight:700;}
+.sim-card{background:#fff;padding:25px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.05);margin-bottom:30px;}
+input{width:100%;padding:12px;border-radius:6px;border:1px solid #ccc;margin-top:10px;}
+.primary-btn{background:#0F4C75;color:white;border:none;padding:12px;border-radius:6px;cursor:pointer;margin-top:15px;width:100%;font-weight:600;}
+.history-item{background:#fff;padding:25px;border-radius:15px;box-shadow:0 6px 18px rgba(0,0,0,.08);margin-bottom:25px;transition:transform .2s;}
+.history-item:hover{transform:translateY(-3px);}
+.client-name{font-weight:600;font-size:16px;margin-bottom:12px;color:#0F4C75;}
+.disease-list{display:flex;flex-wrap:wrap;gap:12px;}
+.disease-item{background:#f1f3f5;padding:10px 14px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;font-size:14px;box-shadow:0 2px 5px rgba(0,0,0,.05);}
+.disease-item button{background:transparent;border:none;color:#b00000;cursor:pointer;font-size:18px;}
+.disease-item button::before{content:"🗑️";}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);justify-content:center;align-items:center;z-index:1000;}
+.modal-content{background:#fff;padding:35px;border-radius:12px;width:90%;max-width:400px;box-shadow:0 15px 40px rgba(0,0,0,.15);animation:fadeIn .2s ease;}
+.modal-content input{margin-bottom:12px;}
+.modal-content button{width:100%;padding:12px;border:none;border-radius:6px;cursor:pointer;margin-top:8px;font-weight:600;}
+.close-btn{background:#ccc;color:#333;}
+@keyframes fadeIn{from{transform:scale(.95);opacity:0;}to{transform:scale(1);opacity:1;}}
+@media(max-width:900px){.disease-list{flex-direction:column;}}
 </style>
 </head>
 <body>
 
-<div class="auth-container">
+<script>
+const currentUser=JSON.parse(localStorage.getItem("currentUser"));
+if(!currentUser){ window.location.href="login.html"; }
+</script>
 
-<div class="logo">HealthSim Platform</div>
+<nav>
+  <div class="logo">HealthSim Platform</div>
+  <div class="nav-right">
+    <span id="userName" style="cursor:pointer;font-weight:600;" onclick="abrirPerfil()"></span>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
 
-<div class="tabs">
-  <button id="loginTab" class="active" onclick="switchTab('login')">Login</button>
-  <button id="registerTab" onclick="switchTab('register')">Registo</button>
+<div class="container">
+  <div class="welcome">
+    <h1>Bem-vindo, <span id="welcomeName"></span></h1>
+    <p>Plataforma de simulação epidemiológica</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <h3>Total Simulações</h3>
+      <p id="totalSim">0</p>
+    </div>
+    <div class="stat">
+      <h3>Última Simulação</h3>
+      <p id="ultimaSim">-</p>
+    </div>
+  </div>
+
+  <div class="sim-card">
+    <h2>Simular Doença</h2>
+    <input id="diseaseInput" placeholder="Nome da doença">
+    <button class="primary-btn" onclick="criarSimulacao()">Simular</button>
+  </div>
+
+  <h2>Histórico / Clientes Infetados</h2>
+  <div id="historico"></div>
 </div>
 
-<!-- LOGIN -->
-<form id="loginForm" class="active">
-  <input type="email" id="loginEmail" placeholder="Email">
-  <input type="password" id="loginPassword" placeholder="Password">
-  <div class="error" id="loginError"></div>
-  <button type="button" class="submit-btn" onclick="login()">Entrar</button>
-</form>
-
-<!-- REGISTO -->
-<form id="registerForm">
-  <input type="text" id="regName" placeholder="Nome completo">
-  <input type="email" id="regEmail" placeholder="Email">
-  <select id="regType">
-    <option value="">Tipo de Utilizador</option>
-    <option value="investigador">Investigador</option>
-    <option value="gestor">Gestor de Saúde</option>
-    <option value="dev">Dev</option>
-  </select>
-  <input type="password" id="regPassword" placeholder="Password">
-  <input type="password" id="regConfirm" placeholder="Confirmar Password">
-  <div class="error" id="registerError"></div>
-  <button type="button" class="submit-btn" onclick="register()">Criar Conta</button>
-</form>
-
-<div class="footer">
-  Plataforma profissional de simulação epidemiológica
-</div>
-
+<!-- MODAL PERFIL -->
+<div id="perfilModal" class="modal">
+  <div class="modal-content">
+    <h2>Editar Perfil</h2>
+    <input id="editName" placeholder="Nome">
+    <input id="editEmail" placeholder="Email">
+    <input id="editPassword" type="password" placeholder="Nova Password (opcional)">
+    <button onclick="guardarPerfil()">Guardar Alterações</button>
+    <button onclick="fecharPerfil()" class="close-btn">Cancelar</button>
+    <div id="perfilMsg" style="margin-top:10px;font-size:14px;"></div>
+  </div>
 </div>
 
 <script>
-function switchTab(tab){
-  document.getElementById("loginForm").classList.remove("active");
-  document.getElementById("registerForm").classList.remove("active");
-  document.getElementById("loginTab").classList.remove("active");
-  document.getElementById("registerTab").classList.remove("active");
+userName.innerText=currentUser.name+" ("+currentUser.type+")";
+welcomeName.innerText=currentUser.name;
 
-  if(tab==="login"){
-    document.getElementById("loginForm").classList.add("active");
-    document.getElementById("loginTab").classList.add("active");
-  }else{
-    document.getElementById("registerForm").classList.add("active");
-    document.getElementById("registerTab").classList.add("active");
-  }
+function logout(){
+  localStorage.removeItem("currentUser");
+  window.location.href="login.html";
 }
 
-function register(){
-  const name = regName.value.trim();
-  const email = regEmail.value.trim();
-  const type = regType.value;
-  const pass = regPassword.value;
-  const confirm = regConfirm.value;
-
-  if(!name || !email || !type || !pass){
-    registerError.textContent="Preencha todos os campos.";
-    return;
-  }
-
-  if(pass !== confirm){
-    registerError.textContent="As passwords não coincidem.";
-    return;
-  }
-
-  const user = {name,email,type,pass};
-  localStorage.setItem(email,JSON.stringify(user));
-
-  registerError.textContent="";
-  alert("Conta criada com sucesso!");
-  switchTab("login");
+// CRIAR SIMULAÇÃO
+function criarSimulacao(){
+  const disease=diseaseInput.value.trim();
+  if(!disease) return;
+  const simulacao={id:Date.now(),name:currentUser.name,email:currentUser.email,disease:disease,infected:Math.random()>0.5,date:new Date().toLocaleString()};
+  let sims=JSON.parse(localStorage.getItem("simulacoes"))||[];
+  sims.push(simulacao);
+  localStorage.setItem("simulacoes",JSON.stringify(sims));
+  carregarHistorico();
+  diseaseInput.value="";
 }
 
-function login(){
-  const email = loginEmail.value.trim();
-  const pass = loginPassword.value;
+// CARREGAR HISTÓRICO
+function carregarHistorico(){
+  const sims=JSON.parse(localStorage.getItem("simulacoes"))||[];
+  historico.innerHTML="";
+  
+  if(currentUser.type==="gestor"){
+    for(let key in localStorage){
+      try{
+        const user=JSON.parse(localStorage.getItem(key));
+        if(user && user.type==="cliente"){
+          const userSims = sims.filter(s=>s.email===user.email && s.infected);
+          if(userSims.length===0) continue;
 
-  const userData = localStorage.getItem(email);
-  if(!userData){
-    loginError.textContent="Utilizador não encontrado.";
-    return;
+          const card=document.createElement("div");
+          card.className="history-item";
+
+          const header=document.createElement("div");
+          header.innerHTML=`<strong>${user.name}</strong><br><small>${user.email} | ${user.type}</small>`;
+          card.appendChild(header);
+
+          const diseaseList=document.createElement("div");
+          diseaseList.className="disease-list";
+
+          userSims.forEach(s=>{
+            const diseaseItem=document.createElement("div");
+            diseaseItem.className="disease-item";
+            diseaseItem.innerHTML=`${s.disease} (${s.date})`;
+            const delBtn=document.createElement("button");
+            delBtn.onclick=()=>eliminarSimulacao(s.id);
+            diseaseItem.appendChild(delBtn);
+            diseaseList.appendChild(diseaseItem);
+          });
+
+          card.appendChild(diseaseList);
+          historico.appendChild(card);
+        }
+      } catch(e){}
+    }
+  } else {
+    const userSims=sims.filter(s => s.email===currentUser.email);
+    const card=document.createElement("div");
+    card.className="history-item";
+    const nameDiv=document.createElement("div");
+    nameDiv.className="client-name";
+    nameDiv.innerText=currentUser.name;
+    card.appendChild(nameDiv);
+
+    const diseaseList=document.createElement("div");
+    diseaseList.className="disease-list";
+    userSims.forEach(s=>{
+      const diseaseItem=document.createElement("div");
+      diseaseItem.className="disease-item";
+      diseaseItem.innerText=`${s.disease} (${s.date}) - ${s.infected?"INFETADO":"SAUDÁVEL"}`;
+      diseaseList.appendChild(diseaseItem);
+    });
+    card.appendChild(diseaseList);
+    historico.appendChild(card);
   }
 
-  const user = JSON.parse(userData);
-  if(user.pass !== pass){
-    loginError.textContent="Password incorreta.";
-    return;
-  }
-
-  loginError.textContent="";
-  alert("Bem-vindo "+user.name+" ("+user.type+")");
-  window.location.href="dashboard.html"; // podes ligar ao teu dashboard
+  const total=sims.filter(s => s.email===currentUser.email || currentUser.type==="gestor").length;
+  totalSim.innerText=total;
+  ultimaSim.innerText=total ? sims[sims.length-1].date : "-";
 }
+
+// ELIMINAR SIMULAÇÃO
+function eliminarSimulacao(simId){
+  let sims=JSON.parse(localStorage.getItem("simulacoes"))||[];
+  sims=sims.filter(s=>s.id!==simId);
+  localStorage.setItem("simulacoes",JSON.stringify(sims));
+  carregarHistorico();
+}
+
+// PERFIL MODAL
+function abrirPerfil(){
+  editName.value=currentUser.name;
+  editEmail.value=currentUser.email;
+  editPassword.value="";
+  perfilModal.style.display="flex";
+}
+function fecharPerfil(){
+  perfilModal.style.display="none";
+  perfilMsg.innerHTML="";
+}
+function guardarPerfil(){
+  const novoNome=editName.value.trim();
+  const novoEmail=editEmail.value.trim();
+  const novaPass=editPassword.value.trim();
+  if(!novoNome || !novoEmail){perfilMsg.innerHTML="<span style='color:red'>Nome e Email obrigatórios</span>";return;}
+  if(novoEmail !== currentUser.email && localStorage.getItem(novoEmail)){perfilMsg.innerHTML="<span style='color:red'>Email já registado</span>";return;}
+  let userAtualizado={...currentUser,name:novoNome,email:novoEmail,pass:novaPass?novaPass:currentUser.pass};
+  localStorage.removeItem(currentUser.email);
+  localStorage.setItem(novoEmail,JSON.stringify(userAtualizado));
+  localStorage.setItem("currentUser",JSON.stringify(userAtualizado));
+  currentUser.name=novoNome;
+  currentUser.email=novoEmail;
+  userName.innerText=currentUser.name+" ("+currentUser.type+")";
+  welcomeName.innerText=currentUser.name;
+  perfilMsg.innerHTML="<span style='color:green'>Perfil atualizado!</span>";
+  setTimeout(()=>{fecharPerfil();},1200);
+}
+
+carregarHistorico();
 </script>
 
 </body>
