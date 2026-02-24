@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthSim Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#0F4C75;
+  --secondary:#3282B8;
+  --accent:#1B9AAA;
+  --light:#F5F7FA;
+  --card:#FFFFFF;
+  --text:#1F2937;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
+
+body{
+  background:var(--light);
+  color:var(--text);
+}
+
+/* NAVBAR */
+nav{
+  background:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 40px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.logo{
+  font-weight:700;
+  font-size:20px;
+  color:var(--primary);
+}
+
+.nav-links{
+  display:flex;
+  gap:20px;
+  align-items:center;
+}
+
+.nav-links a{
+  text-decoration:none;
+  color:#555;
+  font-weight:500;
+}
+
+.user-circle{
+  width:35px;
+  height:35px;
+  background:var(--primary);
+  color:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+}
+
+/* CONTAINER */
+.container{
+  max-width:1200px;
+  margin:40px auto;
+  padding:20px;
+}
+
+/* HERO */
+.hero h1{
+  font-size:28px;
+  margin-bottom:10px;
+}
+
+.hero p{
+  color:#555;
+  margin-bottom:30px;
+}
+
+/* ACTION CARDS */
+.actions{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.action-card{
+  flex:1;
+  min-width:300px;
+  background:var(--primary);
+  color:white;
+  padding:25px;
+  border-radius:15px;
+}
+
+.action-card.secondary{
+  background:var(--accent);
+}
+
+.action-card button{
+  margin-top:15px;
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  background:white;
+  color:var(--primary);
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* STATS */
+.stats{
+  display:flex;
+  gap:20px;
+  margin-top:30px;
+  flex-wrap:wrap;
+}
+
+.stat-card{
+  flex:1;
+  min-width:220px;
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.05);
+}
+
+.stat-card h3{
+  font-size:14px;
+  color:#666;
+  margin-bottom:10px;
+}
+
+.stat-card p{
+  font-size:22px;
+  font-weight:700;
+}
+
+/* ABOUT */
+.about{
+  margin-top:40px;
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.05);
+}
+
+.about-columns{
+  display:flex;
+  gap:40px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+.about-columns div{
+  flex:1;
+  min-width:250px;
+}
+
+/* LOGIN MODAL */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal-content{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  width:350px;
+}
+
+.modal-content h2{
+  margin-bottom:15px;
+}
+
+.modal-content input, select{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.modal-content button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  background:var(--primary);
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+@media(max-width:768px){
+  .actions, .stats, .about-columns{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">HealthSim Platform</div>
+  <div class="nav-links">
+    <a href="#">Dashboard</a>
+    <a href="#">Nova Simulação</a>
+    <a href="#">Histórico</a>
+    <div class="user-circle" onclick="openLogin()">U</div>
+  </div>
+</nav>
+
+<div class="container">
+
+<div class="hero">
+  <h1>Bem-vindo ao HealthSim Platform</h1>
+  <p>Plataforma profissional de simulação epidemiológica para investigação em saúde pública</p>
+</div>
+
+<div class="actions">
+  <div class="action-card">
+    <h2>Criar Nova Simulação</h2>
+    <p>Configure parâmetros e execute uma nova simulação epidemiológica</p>
+    <button>Começar Agora</button>
+  </div>
+
+  <div class="action-card secondary">
+    <h2>Ver Histórico</h2>
+    <p>Aceda a simulações anteriores e exporte relatórios</p>
+    <button>Explorar Histórico</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card">
+    <h3>Simulações Totais</h3>
+    <p>127</p>
+  </div>
+  <div class="stat-card">
+    <h3>Taxa Média de Infeção</h3>
+    <p>23.4%</p>
+  </div>
+  <div class="stat-card">
+    <h3>População Total Simulada</h3>
+    <p>2.4M</p>
+  </div>
+  <div class="stat-card">
+    <h3>Última Simulação</h3>
+    <p>2h atrás</p>
+  </div>
+</div>
+
+<div class="about">
+  <h2>Sobre a Plataforma</h2>
+  <div class="about-columns">
+    <div>
+      <h3>Para Investigadores Académicos</h3>
+      <ul>
+        <li>Configuração avançada de parâmetros</li>
+        <li>Exportação de dados CSV</li>
+        <li>Transparência nos modelos</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Para Gestores de Saúde Pública</h3>
+      <ul>
+        <li>Dashboards visuais claros</li>
+        <li>Relatórios PDF prontos</li>
+        <li>Interface simplificada</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal">
+  <div class="modal-content">
+    <h2>Login</h2>
+    <select id="userType">
+      <option value="cliente">Cliente</option>
+      <option value="dev">Dev</option>
+    </select>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Entrar</button>
+  </div>
+</div>
+
+<script>
+function openLogin(){
+  document.getElementById("loginModal").style.display="flex";
+}
+
+function login(){
+  const type = document.getElementById("userType").value;
+  const email = document.getElementById("email").value;
+
+  alert("Login realizado como "+type+" ("+email+")");
+  document.getElementById("loginModal").style.display="none";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthSim - Autenticação</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#0F4C75;
+  --accent:#1B9AAA;
+  --light:#F5F7FA;
+  --text:#1F2937;
+  --error:#EF4444;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#0F4C75,#1B9AAA);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+.auth-container{
+  background:white;
+  width:400px;
+  padding:40px;
+  border-radius:16px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.15);
+}
+
+.logo{
+  text-align:center;
+  font-weight:700;
+  font-size:22px;
+  margin-bottom:25px;
+  color:var(--primary);
+}
+
+.tabs{
+  display:flex;
+  margin-bottom:25px;
+}
+
+.tabs button{
+  flex:1;
+  padding:10px;
+  border:none;
+  background:#eee;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.tabs button.active{
+  background:var(--primary);
+  color:white;
+  border-radius:8px;
+}
+
+form{
+  display:none;
+}
+
+form.active{
+  display:block;
+}
+
+input, select{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:14px;
+}
+
+input:focus{
+  border-color:var(--accent);
+  outline:none;
+}
+
+button.submit-btn{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  background:var(--primary);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button.submit-btn:hover{
+  background:#0b3b5a;
+}
+
+.error{
+  color:var(--error);
+  font-size:13px;
+  margin-top:5px;
+}
+
+.footer{
+  text-align:center;
+  margin-top:15px;
+  font-size:13px;
+  color:#666;
+}
+
+@media(max-width:480px){
+  .auth-container{
+    width:90%;
+    padding:25px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-container">
+
+<div class="logo">HealthSim Platform</div>
+
+<div class="tabs">
+  <button id="loginTab" class="active" onclick="switchTab('login')">Login</button>
+  <button id="registerTab" onclick="switchTab('register')">Registo</button>
+</div>
+
+<!-- LOGIN -->
+<form id="loginForm" class="active">
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Password">
+  <div class="error" id="loginError"></div>
+  <button type="button" class="submit-btn" onclick="login()">Entrar</button>
+</form>
+
+<!-- REGISTO -->
+<form id="registerForm">
+  <input type="text" id="regName" placeholder="Nome completo">
+  <input type="email" id="regEmail" placeholder="Email">
+  <select id="regType">
+    <option value="">Tipo de Utilizador</option>
+    <option value="investigador">Investigador</option>
+    <option value="gestor">Gestor de Saúde</option>
+    <option value="dev">Dev</option>
+  </select>
+  <input type="password" id="regPassword" placeholder="Password">
+  <input type="password" id="regConfirm" placeholder="Confirmar Password">
+  <div class="error" id="registerError"></div>
+  <button type="button" class="submit-btn" onclick="register()">Criar Conta</button>
+</form>
+
+<div class="footer">
+  Plataforma profissional de simulação epidemiológica
+</div>
+
+</div>
+
+<script>
+function switchTab(tab){
+  document.getElementById("loginForm").classList.remove("active");
+  document.getElementById("registerForm").classList.remove("active");
+  document.getElementById("loginTab").classList.remove("active");
+  document.getElementById("registerTab").classList.remove("active");
+
+  if(tab==="login"){
+    document.getElementById("loginForm").classList.add("active");
+    document.getElementById("loginTab").classList.add("active");
+  }else{
+    document.getElementById("registerForm").classList.add("active");
+    document.getElementById("registerTab").classList.add("active");
+  }
+}
+
+function register(){
+  const name = regName.value.trim();
+  const email = regEmail.value.trim();
+  const type = regType.value;
+  const pass = regPassword.value;
+  const confirm = regConfirm.value;
+
+  if(!name || !email || !type || !pass){
+    registerError.textContent="Preencha todos os campos.";
+    return;
+  }
+
+  if(pass !== confirm){
+    registerError.textContent="As passwords não coincidem.";
+    return;
+  }
+
+  const user = {name,email,type,pass};
+  localStorage.setItem(email,JSON.stringify(user));
+
+  registerError.textContent="";
+  alert("Conta criada com sucesso!");
+  switchTab("login");
+}
+
+function login(){
+  const email = loginEmail.value.trim();
+  const pass = loginPassword.value;
+
+  const userData = localStorage.getItem(email);
+  if(!userData){
+    loginError.textContent="Utilizador não encontrado.";
+    return;
+  }
+
+  const user = JSON.parse(userData);
+  if(user.pass !== pass){
+    loginError.textContent="Password incorreta.";
+    return;
+  }
+
+  loginError.textContent="";
+  alert("Bem-vindo "+user.name+" ("+user.type+")");
+  window.location.href="dashboard.html"; // podes ligar ao teu dashboard
+}
+</script>
+
+</body>
+</html>
