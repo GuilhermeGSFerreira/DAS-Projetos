@@ -133,6 +133,17 @@ background:#ccc;
 color:#333;
 }
 
+.chart-wrapper{
+	max-width:700px;
+	margin:20px auto;
+}
+
+#graficoSIR{
+	width:100%;
+	height:300px;
+	display:block;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -224,7 +235,9 @@ Simular Diagnóstico
 </div>
 
 <div id="resultadoSimulacao"></div>
-<canvas id="graficoSIR"></canvas>
+<div class="chart-wrapper">
+	<canvas id="graficoSIR"></canvas>
+</div>
 
 <!-- PERFIL MODAL -->
 <div id="perfilModal" class="modal">
@@ -318,44 +331,52 @@ return hist;
 /* EXEC SIR */
 
 function executarSimulacao(){
+	const popTotalEl = document.getElementById('popTotal');
+	const infInicialEl = document.getElementById('infInicial');
+	const betaEl = document.getElementById('beta');
+	const gammaEl = document.getElementById('gamma');
+	const duracaoEl = document.getElementById('duracao');
+	const resultadoEl = document.getElementById('resultadoSimulacao');
 
-let pop=parseInt(popTotal.value);
-let inf=parseInt(infInicial.value);
-let betaVal=parseFloat(beta.value);
-let gammaVal=parseFloat(gamma.value);
-let dias=parseInt(duracao.value);
+	const pop = parseInt(popTotalEl.value, 10);
+	const inf = parseInt(infInicialEl.value, 10);
+	const betaVal = parseFloat(betaEl.value);
+	const gammaVal = parseFloat(gammaEl.value);
+	const dias = parseInt(duracaoEl.value, 10);
 
-if(!pop||!inf||!betaVal||!gammaVal||!dias){
-alert("Preencha todos os parâmetros");
-return;
-}
+	if (!pop || !inf || Number.isNaN(betaVal) || Number.isNaN(gammaVal) || !dias) {
+		alert('Preencha todos os parâmetros corretamente');
+		return;
+	}
 
-let resultado=motorSIR(pop,inf,betaVal,gammaVal,dias);
+	const resultado = motorSIR(pop, inf, betaVal, gammaVal, dias);
 
-resultadoSimulacao.innerHTML="";
+	resultadoEl.innerHTML = '';
 
-resultado.forEach(d=>{
-let div=document.createElement("div");
-div.style.fontSize="14px";
-div.innerText=`Dia ${d.dia} | S:${d.S} I:${d.I} R:${d.R} Rt:${d.Rt}`;
-resultadoSimulacao.appendChild(div);
-});
+	resultado.forEach(d => {
+		const div = document.createElement('div');
+		div.style.fontSize = '14px';
+		div.innerText = `Dia ${d.dia} | S:${d.S} I:${d.I} R:${d.R} Rt:${d.Rt}`;
+		resultadoEl.appendChild(div);
+	});
 
-/* guardar simulação */
+	/* guardar simulação */
+	const d = getDoencas();
 
-let d=getDoencas();
+	d.push({
+		id: Date.now(),
+		email: currentUser.email,
+		name: currentUser.name,
+		disease: 'SIR Simulation',
+		status: 'ativo',
+		date: new Date().toLocaleString()
+	});
 
-d.push({
-id:Date.now(),
-email:currentUser.email,
-name:currentUser.name,
-disease:"SIR Simulation",
-status:"ativo",
-date:new Date().toLocaleString()
-});
+	saveDoencas(d);
+	carregarHistorico();
 
-saveDoencas(d);
-carregarHistorico();
+	// Atualiza o gráfico com os dados da simulação
+	desenharGraficoSIR(resultado);
 }
 
 /* SIMULADOR CLIENTE */
@@ -512,17 +533,17 @@ localStorage.removeItem("currentUser");
 location.href="login.html";
 }
 
-carregarHistorico();
-
 function desenharGraficoSIR(dados){
+
+if(!Array.isArray(dados)) dados = [];
 
 let ctx=document.getElementById("graficoSIR").getContext("2d");
 
-let labels=dados.map(x=>"Dia "+x.dia);
+let labels = dados.length ? dados.map(x=>"Dia "+x.dia) : [];
 
-let S=dados.map(x=>x.S);
-let I=dados.map(x=>x.I);
-let R=dados.map(x=>x.R);
+let S = dados.length ? dados.map(x=>x.S) : [];
+let I = dados.length ? dados.map(x=>x.I) : [];
+let R = dados.length ? dados.map(x=>x.R) : [];
 
 if(window.graficoSIRInstance){
 window.graficoSIRInstance.destroy();
@@ -533,18 +554,44 @@ type:"line",
 data:{
 labels:labels,
 datasets:[
-{label:"Suscetíveis",data:S},
-{label:"Infetados",data:I},
-{label:"Recuperados",data:R}
+{
+label:"Suscetíveis",
+data:S,
+borderColor:'#0F4C75',
+backgroundColor:'rgba(15,76,117,0.08)',
+fill:true,
+tension:0.3
+},
+{
+label:"Infetados",
+data:I,
+borderColor:'#dc3545',
+backgroundColor:'rgba(220,53,69,0.08)',
+fill:true,
+tension:0.3
+},
+{
+label:"Recuperados",
+data:R,
+borderColor:'#28a745',
+backgroundColor:'rgba(40,167,69,0.08)',
+fill:true,
+tension:0.3
+}
 ]
 },
-options:{responsive:true}
+options:{
+responsive:true,
+scales:{
+y:{beginAtZero:true}
+}
+}
 });
 
 }
 
 carregarHistorico();
-desenharGraficoSIR(resultado);
+desenharGraficoSIR([]);
 
 </script>
 
