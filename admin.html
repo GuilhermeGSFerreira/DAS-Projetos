@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+
+<style>
+
+body{
+font-family:Inter;
+background:#f5f6fa;
+padding:40px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+button{
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+margin-left:5px;
+}
+
+.delete{
+background:#dc3545;
+color:white;
+}
+
+.save{
+background:#0F4C75;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>👑 Painel Administrador</h2>
+
+<div id="listaUsers"></div>
+
+<script>
+
+let currentUser=JSON.parse(localStorage.getItem("currentUser"));
+
+if(!currentUser || currentUser.type!=="admin"){
+alert("Acesso restrito!");
+location.href="login.html";
+}
+
+function carregarUsers(){
+
+let container=document.getElementById("listaUsers");
+container.innerHTML="";
+
+for(let key in localStorage){
+
+if(key==="currentUser") continue;
+
+let userData=localStorage.getItem(key);
+
+try{
+
+let user=JSON.parse(userData);
+
+if(!user.email) continue;
+
+let card=document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+<b>Nome:</b> ${user.name}<br>
+<b>Email:</b> ${user.email}<br>
+
+<select id="type_${user.email}">
+<option value="cliente" ${user.type==="cliente"?"selected":""}>Cliente</option>
+<option value="gestor" ${user.type==="gestor"?"selected":""}>Gestor</option>
+<option value="admin" ${user.type==="admin"?"selected":""}>Admin</option>
+</select>
+
+<button class="save" onclick="alterarTipo('${user.email}')">
+Salvar
+</button>
+
+<button class="delete" onclick="eliminarUser('${user.email}')">
+Eliminar
+</button>
+`;
+
+container.appendChild(card);
+
+}catch(e){}
+
+}
+
+}
+
+function alterarTipo(email){
+
+let user=JSON.parse(localStorage.getItem(email));
+
+let select=document.getElementById("type_"+email);
+
+user.type=select.value;
+
+localStorage.setItem(email,JSON.stringify(user));
+
+alert("Atualizado!");
+
+carregarUsers();
+}
+
+function eliminarUser(email){
+
+if(!confirm("Eliminar utilizador?")) return;
+
+localStorage.removeItem(email);
+
+carregarUsers();
+}
+
+carregarUsers();
+
+</script>
+
+</body>
+</html>

@@ -2,8 +2,8 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HealthSim Login</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -12,7 +12,7 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:'Inter',sans-serif;
+font-family:Inter;
 }
 
 body{
@@ -45,7 +45,6 @@ padding:12px;
 margin-bottom:12px;
 border-radius:8px;
 border:1px solid #ddd;
-font-size:14px;
 }
 
 button{
@@ -57,11 +56,6 @@ cursor:pointer;
 font-weight:600;
 background:#0F4C75;
 color:white;
-transition:.2s;
-}
-
-button:hover{
-opacity:.9;
 }
 
 .tabs{
@@ -85,12 +79,6 @@ font-size:14px;
 margin-bottom:10px;
 }
 
-@media(max-width:480px){
-.auth-container{
-padding:25px;
-}
-}
-
 </style>
 </head>
 
@@ -98,32 +86,47 @@ padding:25px;
 
 <div class="auth-container">
 
-<h2>Simulador Epidémico Interativo</h2>
+<h2>HealthSim</h2>
 
 <div class="tabs">
 <button id="loginTab" class="active" onclick="switchTab('login')">Login</button>
 <button id="registerTab" onclick="switchTab('register')">Registo</button>
 </div>
 
+<!-- LOGIN -->
+
 <div id="loginForm">
+
 <input id="loginEmail" placeholder="Email">
 <input id="loginPassword" type="password" placeholder="Password">
+
 <div id="loginMsg" class="msg"></div>
+
 <button onclick="login()">Entrar</button>
+
 </div>
 
+<!-- REGISTO -->
+
 <div id="registerForm" style="display:none">
+
 <input id="regName" placeholder="Nome">
+
 <input id="regEmail" placeholder="Email">
+
 <select id="regType">
-<option value="">Tipo de Utilizador</option>
 <option value="cliente">Cliente</option>
-<option value="gestor">Gestor de Saúde</option>
+<option value="gestor">Gestor</option>
+<option value="admin">Admin</option>
 </select>
+
 <input id="regPassword" type="password" placeholder="Password">
 <input id="regConfirm" type="password" placeholder="Confirmar Password">
+
 <div id="registerMsg" class="msg"></div>
+
 <button onclick="register()">Criar Conta</button>
+
 </div>
 
 </div>
@@ -132,12 +135,14 @@ padding:25px;
 
 function switchTab(tab){
 
-loginForm.style.display = tab==="login" ? "block":"none";
-registerForm.style.display = tab==="register" ? "block":"none";
+loginForm.style.display=tab==="login"?"block":"none";
+registerForm.style.display=tab==="register"?"block":"none";
 
 loginTab.classList.toggle("active",tab==="login");
 registerTab.classList.toggle("active",tab==="register");
 }
+
+/* ⭐ REGISTO */
 
 function register(){
 
@@ -147,43 +152,70 @@ const type=regType.value;
 const pass=regPassword.value;
 const confirm=regConfirm.value;
 
-if(!name||!email||!type||!pass){
-registerMsg.innerHTML="<span style='color:red'>Preencha todos os campos</span>";
+if(!name||!email||!pass){
+registerMsg.innerHTML="Preencha todos os campos";
 return;
 }
 
 if(pass!==confirm){
-registerMsg.innerHTML="<span style='color:red'>Passwords não coincidem</span>";
+registerMsg.innerHTML="Passwords não coincidem";
 return;
 }
 
-const user={name,email,type,pass};
+/* ⭐ primeiro utilizador = admin automático */
+
+let totalUsers=0;
+
+for(let key in localStorage){
+if(key!=="currentUser"){
+try{
+let u=JSON.parse(localStorage.getItem(key));
+if(u && u.email) totalUsers++;
+}catch(e){}
+}
+}
+
+let user={name,email,type,pass};
+
+if(totalUsers===0){
+user.type="admin";
+}
+
 localStorage.setItem(email,JSON.stringify(user));
 
-registerMsg.innerHTML="<span style='color:green'>Conta criada com sucesso!</span>";
+registerMsg.innerHTML="<span style='color:green'>Conta criada!</span>";
 }
+
+/* ⭐ LOGIN */
 
 function login(){
 
 const email=loginEmail.value.trim();
 const pass=loginPassword.value;
 
-const data=localStorage.getItem(email);
+let data=localStorage.getItem(email);
 
 if(!data){
-loginMsg.innerHTML="<span style='color:red'>Utilizador não existe</span>";
+loginMsg.innerHTML="Utilizador não existe";
 return;
 }
 
-const user=JSON.parse(data);
+let user=JSON.parse(data);
 
 if(user.pass!==pass){
-loginMsg.innerHTML="<span style='color:red'>Password incorreta</span>";
+loginMsg.innerHTML="Password incorreta";
 return;
 }
 
 localStorage.setItem("currentUser",JSON.stringify(user));
-window.location.href="home.html";
+
+if(user.type==="admin"){
+location.href="admin.html";
+}
+else{
+location.href="home.html";
+}
+
 }
 
 </script>
