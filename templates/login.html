@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>HealthSim Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* styles identical to original */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter;
+}
+
+body{
+background:linear-gradient(135deg,#0F4C75,#1B9AAA);
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:20px;
+}
+
+.auth-container{
+background:white;
+padding:40px;
+width:100%;
+max-width:420px;
+border-radius:20px;
+box-shadow:0 20px 50px rgba(0,0,0,.2);
+}
+
+h2{
+text-align:center;
+margin-bottom:25px;
+color:#0F4C75;
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin-bottom:12px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+background:#0F4C75;
+color:white;
+}
+
+.tabs{
+display:flex;
+margin-bottom:20px;
+}
+
+.tabs button{
+flex:1;
+background:#eee;
+color:#333;
+}
+
+.tabs button.active{
+background:#0F4C75;
+color:white;
+}
+
+.msg{
+font-size:14px;
+margin-bottom:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="auth-container">
+
+<h2>HealthSim</h2>
+
+<div class="tabs">
+<button id="loginTab" class="active" onclick="switchTab('login')">Login</button>
+<button id="registerTab" onclick="switchTab('register')">Registo</button>
+</div>
+
+<!-- LOGIN -->
+
+<div id="loginForm">
+
+<input id="loginEmail" name="email" placeholder="Email">
+<input id="loginPassword" name="password" type="password" placeholder="Password">
+
+<div id="loginMsg" class="msg"></div>
+
+<button onclick="login()">Entrar</button>
+
+</div>
+
+<!-- REGISTO -->
+
+<div id="registerForm" style="display:none">
+
+<input id="regName" name="name" placeholder="Nome">
+
+<input id="regEmail" name="email" placeholder="Email">
+
+<select id="regType" name="type">
+<option value="cliente">Cliente</option>
+<option value="gestor">Gestor</option>
+<option value="admin">Admin</option>
+</select>
+
+<input id="regPassword" name="password" type="password" placeholder="Password">
+<input id="regConfirm" type="password" placeholder="Confirmar Password">
+
+<div id="registerMsg" class="msg"></div>
+
+<button onclick="register()">Criar Conta</button>
+
+</div>
+
+</div>
+
+<script>
+function switchTab(tab){
+    loginForm.style.display=tab==="login"?"block":"none";
+    registerForm.style.display=tab==="register"?"block":"none";
+    loginTab.classList.toggle("active",tab==="login");
+    registerTab.classList.toggle("active",tab==="register");
+}
+
+async function register(){
+    const name = regName.value.trim();
+    const email = regEmail.value.trim();
+    const type = regType.value;
+    const pass = regPassword.value;
+    const confirm = regConfirm.value;
+
+    if(!name||!email||!pass){
+        registerMsg.innerHTML="Preencha todos os campos";
+        return;
+    }
+    if(pass!==confirm){
+        registerMsg.innerHTML="Passwords não coincidem";
+        return;
+    }
+
+    const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({name,email,type,password:pass})
+    });
+    const data = await res.json();
+    if(res.ok){
+        registerMsg.innerHTML="<span style='color:green'>Conta criada!</span>";
+    } else {
+        registerMsg.innerHTML = data.erro || 'Erro';
+    }
+}
+
+async function login(){
+    const email = loginEmail.value.trim();
+    const pass = loginPassword.value;
+    const res = await fetch('/api/login', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email,password:pass})
+    });
+    const data = await res.json();
+    if(res.ok){
+        if(data.type==='admin') location.href='/admin';
+        else location.href='/home';
+    } else {
+        loginMsg.innerHTML = data.erro || 'Erro';
+    }
+}
+</script>
+
+</body>
+</html>
