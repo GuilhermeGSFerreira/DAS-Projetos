@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Gerir Tipos e Estados</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter;
+}
+
+body{
+background:#f5f6fa;
+color:#333;
+}
+
+nav{
+background:white;
+padding:18px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+
+.nav-right{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.logout{
+background:#0F4C75;
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:6px;
+cursor:pointer;
+font-weight:600;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:40px 20px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,.05);
+margin-bottom:30px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(450px,1fr));
+gap:30px;
+}
+
+h2{
+margin-bottom:20px;
+color:#0F4C75;
+font-size:24px;
+}
+
+h3{
+margin-bottom:15px;
+color:#1B9AAA;
+font-size:18px;
+}
+
+input, textarea{
+width:100%;
+padding:12px;
+border-radius:6px;
+border:1px solid #ccc;
+margin-bottom:12px;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:600;
+margin-right:8px;
+margin-bottom:12px;
+}
+
+.primary-btn{
+background:#0F4C75;
+color:white;
+width:100%;
+}
+
+.secondary-btn{
+background:#1B9AAA;
+color:white;
+}
+
+.danger-btn{
+background:#dc3545;
+color:white;
+}
+
+.success-btn{
+background:#28a745;
+color:white;
+}
+
+.item{
+background:#f9f9f9;
+padding:15px;
+border-radius:8px;
+margin-bottom:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-left:4px solid #0F4C75;
+}
+
+.item-actions{
+display:flex;
+gap:8px;
+}
+
+.item-actions button{
+margin:0;
+padding:6px 12px;
+font-size:14px;
+}
+
+.msg{
+padding:12px;
+border-radius:6px;
+margin-bottom:12px;
+font-size:14px;
+}
+
+.msg.success{
+background:#d4edda;
+color:#155724;
+border:1px solid #c3e6cb;
+}
+
+.msg.error{
+background:#f8d7da;
+color:#721c24;
+border:1px solid #f5c6cb;
+}
+
+.hidden{
+display:none;
+}
+
+.tab-content.hidden{
+display:none;
+}
+
+.permission-restricted{
+opacity:0.5;
+pointer-events:none;
+}
+
+.badge{
+display:inline-block;
+background:#0F4C75;
+color:white;
+padding:4px 8px;
+border-radius:4px;
+font-size:12px;
+margin-right:8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<nav>
+<h1>HealthSim</h1>
+<div class="nav-right">
+<span id="userName" style="cursor:pointer;font-weight:600" onclick="location.href='/home'"></span>
+<button class="logout" onclick="logout()">Logout</button>
+</div>
+</nav>
+
+<div class="container">
+
+<h2>Gerir Sistema</h2>
+
+<!-- ABAS -->
+<div style="margin-bottom:30px; border-bottom: 2px solid #0F4C75; display: flex; gap: 20px;">
+  <button class="tab-btn" onclick="switchTab('utilizadores')" style="border: none; background: none; padding: 12px 0; cursor: pointer; color: #0F4C75; font-weight: 600; border-bottom: 3px solid #0F4C75;">Utilizadores</button>
+  <button class="tab-btn" onclick="switchTab('estados')" style="border: none; background: none; padding: 12px 0; cursor: pointer; color: #666; font-weight: 600;">Estados</button>
+  <button class="tab-btn" onclick="switchTab('tipos')" style="border: none; background: none; padding: 12px 0; cursor: pointer; color: #666; font-weight: 600;">Tipos</button>
+</div>
+
+<!-- ABA UTILIZADORES -->
+<div id="tab-utilizadores" class="tab-content">
+<div class="card">
+<h3>Gerir Utilizadores</h3>
+<div id="utilizadoresMsg" class="msg hidden"></div>
+<div id="utilizadoresList"></div>
+</div>
+</div>
+
+<!-- ABA ESTADOS -->
+<div id="tab-estados" class="tab-content hidden">
+<div class="card">
+<h3>Estados de Utilizador</h3>
+
+<div id="estadoMsg" class="msg hidden"></div>
+
+<div id="estadosList"></div>
+
+<div id="estadoFormDiv">
+<h4>Novo Estado</h4>
+<input id="novoEstadoInput" type="text" placeholder="Descrição do estado">
+<button class="primary-btn" onclick="criarEstado()">Criar Estado</button>
+</div>
+
+</div>
+</div>
+
+<!-- ABA TIPOS -->
+<div id="tab-tipos" class="tab-content hidden">
+<div class="card">
+<h3>Tipos de Utilizador</h3>
+
+<div id="tipoMsg" class="msg hidden"></div>
+
+<div id="tiposList"></div>
+
+<div id="tipoFormDiv" class="hidden">
+<h4>Novo Tipo</h4>
+<input id="novoTipoInput" type="text" placeholder="Descrição do tipo">
+<button class="primary-btn" onclick="criarTipo()">Criar Tipo</button>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+let currentUser = null;
+
+// Trocar abas
+function switchTab(tab){
+    // Esconder todas as abas
+    document.getElementById('tab-utilizadores').classList.add('hidden');
+    document.getElementById('tab-estados').classList.add('hidden');
+    document.getElementById('tab-tipos').classList.add('hidden');
+    
+    // Mostrar aba selecionada
+    document.getElementById('tab-' + tab).classList.remove('hidden');
+    
+    // Atualizar estilo dos botões
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.style.borderBottom = 'none';
+        btn.style.color = '#666';
+    });
+    event.target.style.borderBottom = '3px solid #0F4C75';
+    event.target.style.color = '#0F4C75';
+}
+
+// Inicializar
+async function init(){
+    const res = await fetch('/api/session');
+    if(res.ok){
+        currentUser = await res.json();
+        userName.innerText = currentUser.name + " (" + currentUser.type + ")";
+        
+        // Mostrar formulário de tipos apenas para dev
+        if(currentUser.type === 'dev'){
+            tipoFormDiv.classList.remove('hidden');
+        }
+        
+        carregarUtilizadores();
+        carregarEstados();
+        carregarTipos();
+    } else {
+        location.href = '/login';
+    }
+}
+
+// --- UTILIZADORES ---
+
+async function carregarUtilizadores(){
+    const res = await fetch('/api/users');
+    const usuarios = await res.json();
+    const container = document.getElementById('utilizadoresList');
+    container.innerHTML = '';
+    
+    usuarios.forEach(u => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.style.flexDirection = 'column';
+        div.style.alignItems = 'flex-start';
+        
+        let actionsHtml = '';
+        
+        // Dev: pode editar, ver dados e apagar
+        if(currentUser.type === 'dev'){
+            actionsHtml = `
+                <button class="secondary-btn" onclick="abrirEdicaoUser(${u.id}, '${u.nome}', '${u.email}', '${u.tipo}', '${u.estado}')">Editar</button>
+                <button class="secondary-btn" onclick="verDadosUtilizador(${u.id}, '${u.nome}')">Ver Dados</button>
+                <button class="danger-btn" onclick="apagarUser(${u.id})">Apagar</button>
+            `;
+        }
+        // Gestor: pode ver dados e editar tipo/estado
+        else if(currentUser.type === 'gestor'){
+            actionsHtml = `
+                <button class="secondary-btn" onclick="abrirEdicaoUserGestor(${u.id}, '${u.tipo}', '${u.estado}')">Editar Tipo/Estado</button>
+                <button class="secondary-btn" onclick="verDadosUtilizador(${u.id}, '${u.nome}')">Ver Dados</button>
+            `;
+        }
+        
+        div.innerHTML = `
+            <div style="flex:1; width:100%; margin-bottom:15px;">
+                <strong>${u.nome}</strong> <br/>
+                <small style="color:#666;">${u.email}</small> <br/>
+                <span class="badge">Tipo: ${u.tipo}</span>
+                <span class="badge" style="background:#1B9AAA;">Estado: ${u.estado}</span>
+            </div>
+            <div class="item-actions" style="width:100%; gap:8px; flex-wrap:wrap;">
+                ${actionsHtml}
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// Modal para editar (Dev)
+function abrirEdicaoUser(id, nome, email, tipo, estado){
+    const novoNome = prompt('Nome:', nome);
+    if(!novoNome) return;
+    
+    const novoEmail = prompt('Email:', email);
+    if(!novoEmail) return;
+    
+    const tipos = ['cliente', 'gestor', 'dev', 'admin'];
+    const tipoSelecionado = prompt('Tipo (' + tipos.join(', ') + '):', tipo);
+    if(!tipoSelecionado || !tipos.includes(tipoSelecionado)) {
+        mostrarMsg('utilizadoresMsg', 'Tipo inválido', 'error');
+        return;
+    }
+    
+    const estados = ['ativo', 'inativo', 'suspenso'];
+    const estadoSelecionado = prompt('Estado (' + estados.join(', ') + '):', estado);
+    if(!estadoSelecionado || !estados.includes(estadoSelecionado)) {
+        mostrarMsg('utilizadoresMsg', 'Estado inválido', 'error');
+        return;
+    }
+    
+    guardarEdicaoUser(id, novoNome, novoEmail, tipoSelecionado, estadoSelecionado);
+}
+
+// Edição simplificada para Gestor (apenas tipo/estado)
+function abrirEdicaoUserGestor(id, tipo, estado){
+    const tipos = ['cliente', 'gestor', 'dev', 'admin'];
+    const tipoSelecionado = prompt('Tipo (' + tipos.join(', ') + '):', tipo);
+    if(!tipoSelecionado || !tipos.includes(tipoSelecionado)) {
+        mostrarMsg('utilizadoresMsg', 'Tipo inválido', 'error');
+        return;
+    }
+    
+    const estados = ['ativo', 'inativo', 'suspenso'];
+    const estadoSelecionado = prompt('Estado (' + estados.join(', ') + '):', estado);
+    if(!estadoSelecionado || !estados.includes(estadoSelecionado)) {
+        mostrarMsg('utilizadoresMsg', 'Estado inválido', 'error');
+        return;
+    }
+    
+    guardarEdicaoUserGestor(id, tipoSelecionado, estadoSelecionado);
+}
+
+// Guardar edição (Dev)
+async function guardarEdicaoUser(id, nome, email, tipo, estado){
+    const res = await fetch(`/api/user/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({nome, email, tipo, estado})
+    });
+    
+    if(res.ok){
+        mostrarMsg('utilizadoresMsg', 'Utilizador atualizado com sucesso', 'success');
+        carregarUtilizadores();
+    } else {
+        const data = await res.json();
+        mostrarMsg('utilizadoresMsg', data.erro || 'Erro ao atualizar', 'error');
+    }
+}
+
+// Guardar edição (Gestor - apenas tipo/estado)
+async function guardarEdicaoUserGestor(id, tipo, estado){
+    const res = await fetch(`/api/user/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({tipo, estado})
+    });
+    
+    if(res.ok){
+        mostrarMsg('utilizadoresMsg', 'Utilizador atualizado com sucesso', 'success');
+        carregarUtilizadores();
+    } else {
+        const data = await res.json();
+        mostrarMsg('utilizadoresMsg', data.erro || 'Erro ao atualizar', 'error');
+    }
+}
+
+// Apagar utilizador (Dev apenas)
+async function apagarUser(id){
+    if(!confirm('Tem a certeza que pretende apagar este utilizador?')) return;
+    
+    const res = await fetch(`/api/user/${id}`, {method: 'DELETE'});
+    
+    if(res.ok){
+        mostrarMsg('utilizadoresMsg', 'Utilizador apagado com sucesso', 'success');
+        carregarUtilizadores();
+    } else {
+        const data = await res.json();
+        mostrarMsg('utilizadoresMsg', data.erro || 'Erro ao apagar', 'error');
+    }
+}
+
+// Ver dados do utilizador (testes e simulações)
+async function verDadosUtilizador(userId, userName){
+    // Fetch testes de doença
+    const resTestes = await fetch(`/api/testes-denca/${userId}`);
+    const testes = resTestes.ok ? await resTestes.json() : [];
+    
+    // Fetch simulações
+    const resSimulacoes = await fetch(`/api/simulacoes-user/${userId}`);
+    const simulacoes = resSimulacoes.ok ? await resSimulacoes.json() : [];
+    
+    // Construir HTML para testes
+    let testesHtml = '';
+    if(testes.length === 0){
+        testesHtml = '<p style="color:#999; text-align:center;">Nenhum teste realizado</p>';
+    } else {
+        testesHtml = testes.map(teste => {
+            const icone = teste.resultado === 'positivo' ? '⚠️' : '✅';
+            const corTexto = teste.resultado === 'positivo' ? 'color:#dc3545;' : 'color:#28a745;';
+            const textoResultado = teste.resultado === 'positivo' ? 'POSITIVO' : 'NEGATIVO';
+            return `
+                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:10px; border-left:4px solid ${teste.resultado === 'positivo' ? '#dc3545' : '#28a745'};">
+                    <div style="font-size:14px; margin-bottom:5px;">${icone} <strong>${textoResultado}</strong> - ${teste.nome_doenca}</div>
+                    <div style="font-size:12px; color:#666;">${teste.criado_em}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Construir HTML para simulações
+    let simulacoesHtml = '';
+    if(simulacoes.length === 0){
+        simulacoesHtml = '<p style="color:#999; text-align:center;">Nenhuma simulação realizada</p>';
+    } else {
+        simulacoesHtml = simulacoes.map(sim => {
+            return `
+                <div style="background:#f9f9f9; padding:12px; border-radius:6px; margin-bottom:10px; border-left:4px solid #0F4C75;">
+                    <div style="font-size:14px; margin-bottom:5px;"><strong>${sim.nome || 'Simulação #' + sim.id}</strong></div>
+                    <div style="font-size:12px; color:#666;">ID: ${sim.id}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Mostrar modal com dados
+    const modalContent = `
+        <div style="background:white; border-radius:12px; padding:30px; max-width:600px; margin:50px auto; box-shadow:0 4px 20px rgba(0,0,0,0.2);">
+            <h2 style="color:#0F4C75; margin-bottom:20px;">Dados de ${userName}</h2>
+            
+            <h3 style="color:#1B9AAA; margin-top:25px; margin-bottom:15px;">Testes de Doença (${testes.length})</h3>
+            ${testesHtml}
+            
+            <h3 style="color:#1B9AAA; margin-top:25px; margin-bottom:15px;">Simulações Realizadas (${simulacoes.length})</h3>
+            ${simulacoesHtml}
+            
+            <button style="width:100%; padding:12px; margin-top:20px; background:#0F4C75; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600;" onclick="fecharModal()">Fechar</button>
+        </div>
+        <div id="modal-overlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:999;" onclick="fecharModal()"></div>
+    `;
+    
+    // Criar container do modal se não existir
+    let modalContainer = document.getElementById('modal-container');
+    if(!modalContainer){
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'modal-container';
+        modalContainer.style.position = 'fixed';
+        modalContainer.style.top = '0';
+        modalContainer.style.left = '0';
+        modalContainer.style.right = '0';
+        modalContainer.style.bottom = '0';
+        modalContainer.style.zIndex = '1000';
+        document.body.appendChild(modalContainer);
+    }
+    modalContainer.innerHTML = modalContent;
+}
+
+function fecharModal(){
+    const modalContainer = document.getElementById('modal-container');
+    if(modalContainer){
+        modalContainer.remove();
+    }
+}
+
+// --- ESTADOS ---
+
+async function carregarEstados(){
+    const res = await fetch('/api/estado-utilizadores');
+    const estados = await res.json();
+    const container = document.getElementById('estadosList');
+    container.innerHTML = '';
+    
+    estados.forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+<span><strong>${e.descricao_estado}</strong> (ID: ${e.id})</span>
+<div class="item-actions">
+  <button class="secondary-btn" onclick="editarEstado(${e.id}, '${e.descricao_estado}')">Editar</button>
+  <button class="danger-btn" onclick="apagarEstado(${e.id})">Apagar</button>
+</div>
+`;
+        container.appendChild(div);
+    });
+}
+
+async function criarEstado(){
+    const descricao = document.getElementById('novoEstadoInput').value.trim();
+    if(!descricao){
+        mostrarMsg('estadoMsg', 'Introduz uma descrição', 'error');
+        return;
+    }
+    
+    const res = await fetch('/api/estado-utilizador', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({descricao_estado: descricao})
+    });
+    
+    if(res.ok){
+        mostrarMsg('estadoMsg', 'Estado criado com sucesso', 'success');
+        document.getElementById('novoEstadoInput').value = '';
+        carregarEstados();
+    } else {
+        const data = await res.json();
+        mostrarMsg('estadoMsg', data.erro || 'Erro ao criar estado', 'error');
+    }
+}
+
+async function editarEstado(id, descricaoAtual){
+    const novaDesc = prompt('Editar descrição:', descricaoAtual);
+    if(!novaDesc) return;
+    
+    const res = await fetch(`/api/estado-utilizador/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({descricao_estado: novaDesc})
+    });
+    
+    if(res.ok){
+        mostrarMsg('estadoMsg', 'Estado atualizado', 'success');
+        carregarEstados();
+    } else {
+        const data = await res.json();
+        mostrarMsg('estadoMsg', data.erro || 'Erro ao editar', 'error');
+    }
+}
+
+async function apagarEstado(id){
+    if(!confirm('Tem a certeza?')) return;
+    
+    const res = await fetch(`/api/estado-utilizador/${id}`, {method: 'DELETE'});
+    
+    if(res.ok){
+        mostrarMsg('estadoMsg', 'Estado apagado', 'success');
+        carregarEstados();
+    } else {
+        const data = await res.json();
+        mostrarMsg('estadoMsg', data.erro || 'Erro ao apagar', 'error');
+    }
+}
+
+// --- TIPOS ---
+
+async function carregarTipos(){
+    const res = await fetch('/api/tipo-utilizadores');
+    const tipos = await res.json();
+    const container = document.getElementById('tiposList');
+    container.innerHTML = '';
+    
+    tipos.forEach(t => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        let actionsHtml = `<button class="secondary-btn" onclick="editarTipo(${t.id}, '${t.descricao_tipo}')">Editar</button>`;
+        
+        // Only dev consegue apagar
+        if(currentUser.type === 'dev'){
+            actionsHtml += `<button class="danger-btn" onclick="apagarTipo(${t.id})">Apagar</button>`;
+        }
+        
+        div.innerHTML = `
+<span><strong>${t.descricao_tipo}</strong> (ID: ${t.id})</span>
+<div class="item-actions">
+  ${actionsHtml}
+</div>
+`;
+        container.appendChild(div);
+    });
+}
+
+async function criarTipo(){
+    const descricao = document.getElementById('novoTipoInput').value.trim();
+    if(!descricao){
+        mostrarMsg('tipoMsg', 'Introduz uma descrição', 'error');
+        return;
+    }
+    
+    const res = await fetch('/api/tipo-utilizador', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({descricao_tipo: descricao})
+    });
+    
+    if(res.ok){
+        mostrarMsg('tipoMsg', 'Tipo criado com sucesso', 'success');
+        document.getElementById('novoTipoInput').value = '';
+        carregarTipos();
+    } else {
+        const data = await res.json();
+        mostrarMsg('tipoMsg', data.erro || 'Erro ao criar tipo', 'error');
+    }
+}
+
+async function editarTipo(id, descricaoAtual){
+    const novaDesc = prompt('Editar descrição:', descricaoAtual);
+    if(!novaDesc) return;
+    
+    const res = await fetch(`/api/tipo-utilizador/${id}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({descricao_tipo: novaDesc})
+    });
+    
+    if(res.ok){
+        mostrarMsg('tipoMsg', 'Tipo atualizado', 'success');
+        carregarTipos();
+    } else {
+        const data = await res.json();
+        mostrarMsg('tipoMsg', data.erro || 'Erro ao editar', 'error');
+    }
+}
+
+async function apagarTipo(id){
+    if(!confirm('Tem a certeza? Apenas dev consegue apagar')) return;
+    
+    const res = await fetch(`/api/tipo-utilizador/${id}`, {method: 'DELETE'});
+    
+    if(res.ok){
+        mostrarMsg('tipoMsg', 'Tipo apagado', 'success');
+        carregarTipos();
+    } else {
+        const data = await res.json();
+        mostrarMsg('tipoMsg', data.erro || 'Erro ao apagar', 'error');
+    }
+}
+
+// --- HELPERS ---
+
+function mostrarMsg(elementId, texto, tipo){
+    const el = document.getElementById(elementId);
+    el.classList.remove('hidden', 'success', 'error');
+    el.classList.add(tipo);
+    el.innerText = texto;
+    setTimeout(() => el.classList.add('hidden'), 4000);
+}
+
+async function logout(){
+    await fetch('/api/logout', {method: 'POST'});
+    location.href = '/login';
+}
+
+init();
+
+</script>
+
+</body>
+</html>
