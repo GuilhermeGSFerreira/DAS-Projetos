@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+
+<style>
+body{
+font-family:Inter;
+background:#f5f6fa;
+padding:40px;
+}
+.card{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+button{
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+margin-left:5px;
+}
+.delete{
+background:#dc3545;
+color:white;
+}
+.save{
+background:#0F4C75;
+color:white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>👑 Painel Administrador</h2>
+
+<div id="listaUsers"></div>
+
+<script>
+// porque sessão setada no servidor, não precisa de localStorage
+async function carregarUsers(){
+    const res = await fetch('/api/users');
+    const users = await res.json();
+    const container = document.getElementById('listaUsers');
+    container.innerHTML = '';
+    users.forEach(user=>{
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+<b>Nome:</b> ${user.nome}<br>
+<b>Email:</b> ${user.email}<br>
+
+<select id="type_${user.id}">
+  <option value="cliente" ${user.tipo==='cliente'?'selected':''}>Cliente</option>
+  <option value="gestor" ${user.tipo==='gestor'?'selected':''}>Gestor</option>
+  <option value="admin" ${user.tipo==='admin'?'selected':''}>Admin</option>
+</select>
+
+<button class="save" onclick="alterarTipo(${user.id})">
+Salvar
+</button>
+
+<button class="delete" onclick="eliminarUser(${user.id})">
+Eliminar
+</button>
+`;
+        container.appendChild(card);
+    });
+}
+
+async function alterarTipo(id){
+    const select = document.getElementById('type_'+id);
+    await fetch(`/api/user/${id}`, {
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({type: select.value})
+    });
+    alert('Atualizado!');
+    carregarUsers();
+}
+
+async function eliminarUser(id){
+    if(!confirm('Eliminar utilizador?')) return;
+    await fetch(`/api/user/${id}`, {method:'DELETE'});
+    carregarUsers();
+}
+
+carregarUsers();
+
+</script>
+
+</body>
+</html>
